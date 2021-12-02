@@ -2,7 +2,8 @@ const socket = io("/"); // socket connect to root path of localhost
 const videoGrid = document.getElementById("video-grid");
 const myPeer = new Peer(undefined, {
   host: "/",
-  port: 3001,
+  port: 9000,
+  path: "/peer",
 });
 
 const myVideo = document.createElement("video");
@@ -22,6 +23,7 @@ navigator.mediaDevices
     // RECEIVE CALLS
     myPeer.on("call", (call) => {
       // when someone calls us, send them our stream (sends user B's video to our screen user A)
+      console.log("receiving call ☎️...");
       call.answer(stream);
 
       // other user video stream (user A video to user B screen)
@@ -61,6 +63,7 @@ function connectToNewUser(userId, stream) {
     addVideoStream(video, userVideoStream);
   });
   call.on("close", () => {
+    console.log("hanging up user: ", userId);
     video.remove(); // cleanup video when they lave
   });
   peers[userId] = call;

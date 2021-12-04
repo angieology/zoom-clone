@@ -8,6 +8,7 @@ const myPeer = new Peer(undefined, {
 
 const myVideo = document.createElement("video");
 myVideo.muted = true; // don't listen to your own video. doesn't mute for other people
+myVideo.controls = true;
 
 const peers = {};
 // try to connect our video
@@ -28,8 +29,17 @@ navigator.mediaDevices
 
       // other user video stream (user A video to user B screen)
       const video = document.createElement("video");
+
       call.on("stream", (userVideoStream) => {
         addVideoStream(video, userVideoStream);
+
+        // get reference to all existing user connections so we can remove videos on disconnect
+        call.on("close", () => {
+          video.remove();
+        });
+        Object.keys(myPeer.connections).forEach((userId) => {
+          peers[userId] = call;
+        });
       });
     });
 
@@ -40,8 +50,11 @@ navigator.mediaDevices
   });
 
 socket.on("user-disconnected", (userId) => {
-  console.log(userId);
-  if (peers[userId]) peers[userId].close();
+  console.log("disconnected: ", userId);
+
+  if (peers[userId]) {
+    peers[userId].close();
+  }
 });
 
 myPeer.on("open", (id) => {

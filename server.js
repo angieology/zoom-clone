@@ -18,6 +18,7 @@ app.get("/", (req, res) => {
 
 app.get("/:room", (req, res) => {
   res.render("room", { roomId: req.params.room });
+  // send room to client as a variable (sent to ejs template)
 });
 
 io.on("connection", (socket) => {
